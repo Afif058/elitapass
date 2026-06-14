@@ -78,10 +78,21 @@ export default function Scanner() {
 
     const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase
+    const nouveauxPoints = (carte.clients.points || 0) + points;
+const nbTampons = carte.clients.nb_tampons || 10;
+const pointsFinaux = nouveauxPoints >= nbTampons ? 0 : nouveauxPoints;
+const recompenseAtteinte = nouveauxPoints >= nbTampons;
+
+await supabase
       .from("clients")
-      .update({ points: (carte.clients.points || 0) + points })
+      .update({ points: pointsFinaux })
       .eq("id", carte.client_id);
+
+if (recompenseAtteinte) {
+  setMessage(`🎉 Récompense débloquée ! Carte remise à zéro !`);
+} else {
+  setMessage(`✅ ${points} point(s) ajouté(s) à ${carte.clients.prenom} ${carte.clients.nom} !`);
+}
 
     await supabase.from("transactions").insert({
       client_id: carte.client_id,
