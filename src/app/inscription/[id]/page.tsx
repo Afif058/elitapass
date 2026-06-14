@@ -59,6 +59,19 @@ export default function InscriptionClient() {
       qr_code: qrCode,
     });
 
+    if (form.email) {
+      await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          prenom: form.prenom,
+          nom: form.nom,
+          carteUrl: `https://elitapass.vercel.app/carte/${clientData.id}`,
+        }),
+      });
+    }
+
     router.push(`/carte/${clientData.id}`);
   };
 
