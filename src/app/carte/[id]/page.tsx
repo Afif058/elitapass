@@ -71,7 +71,7 @@ export default function CarteClient() {
   const pointsManquants = Math.max(0, nbTampons - pointsActuels);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: "#000" }}>
+    <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: "#ffffff" }}>
       
       {/* Carte plein écran style Wallet */}
       <div style={{
