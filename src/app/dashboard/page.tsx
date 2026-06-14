@@ -50,7 +50,7 @@ export default function Dashboard() {
     </main>
   );
 
-  const qrUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/inscription/${commercant?.id}`;
+  const qrUrl = `https://elitapass.vercel.app/inscription/${commercant?.id}`;
 
   return (
     <main className="min-h-screen bg-gray-50">
