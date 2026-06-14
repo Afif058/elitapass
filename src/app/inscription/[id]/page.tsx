@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
@@ -116,13 +117,13 @@ export default function InscriptionClient() {
           >
             {loading ? "Création en cours..." : "Créer ma carte 🎴"}
           </button>
-          
+          <Link
             href="/retrouver-carte"
             className="text-center text-sm"
             style={{ color: "rgba(0,0,0,0.4)" }}
           >
             Déjà une carte ? Retrouve-la ici
-          </a>
+          </Link>
         </div>
       </div>
     </main>
