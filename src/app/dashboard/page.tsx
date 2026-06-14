@@ -50,7 +50,7 @@ export default function Dashboard() {
     </main>
   );
 
-  const qrUrl = `https://elitapass.vercel.app/inscription/${commercant?.id}`;
+  const qrUrl = commercant ? `https://elitapass.vercel.app/inscription/${commercant.id}` : "";
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -77,7 +77,7 @@ export default function Dashboard() {
           <p className="text-gray-500 text-sm text-center">
             Affichez ce QR code en caisse — vos clients le scannent pour créer leur carte fidélité
           </p>
-          <QRCode value={qrUrl} size={200} />
+          {qrUrl ? <QRCode value={qrUrl} size={200} /> : <p className="text-gray-400">Chargement...</p>}
           <p className="text-xs text-gray-400 text-center break-all">{qrUrl}</p>
         </div>
 
