@@ -66,7 +66,7 @@ export default function Scanner() {
 
     const { data: carte } = await supabase
       .from("cartes")
-      .select("*, clients(*)")
+      .select("*, clients(*), commercants(*)")
       .eq("qr_code", qrCodeValue)
       .single();
 
@@ -79,7 +79,7 @@ export default function Scanner() {
     const { data: { user } } = await supabase.auth.getUser();
 
     const nouveauxPoints = (carte.clients.points || 0) + points;
-const nbTampons = carte.clients.nb_tampons || 10;
+const nbTampons = carte.commercants?.nb_tampons || 10;
 const pointsFinaux = nouveauxPoints >= nbTampons ? 0 : nouveauxPoints;
 const recompenseAtteinte = nouveauxPoints >= nbTampons;
 
