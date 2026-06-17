@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -12,6 +12,9 @@ const supabase = createClient(
 export default function InscriptionClient() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const refId = searchParams.get("ref");
+
   const [form, setForm] = useState({
     nom: "",
     prenom: "",
@@ -59,21 +62,7 @@ export default function InscriptionClient() {
       qr_code: qrCode,
     });
 
-    if (form.email) {
-      await fetch("/api/send-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email,
-          prenom: form.prenom,
-          nom: form.nom,
-          carteUrl: `https://elitapass.vercel.app/carte/${clientData.id}`,
-        }),
-      });
-    }
-
     // Gérer l'affiliation
-    const refId = new URLSearchParams(window.location.search).get("ref");
     if (refId) {
       const { data: parrain } = await supabase
         .from("clients")
@@ -85,7 +74,7 @@ export default function InscriptionClient() {
         const maintenant = new Date();
         const dernierReset = new Date(parrain.affiliation_last_reset || maintenant);
         const moisDiff = (maintenant.getFullYear() - dernierReset.getFullYear()) * 12 + maintenant.getMonth() - dernierReset.getMonth();
-        
+
         let countMois = parrain.affiliation_count_mois || 0;
         if (moisDiff >= 1) countMois = 0;
 
@@ -93,7 +82,6 @@ export default function InscriptionClient() {
           const tamponsParrain = parrain.commercants?.affiliation_tampons_parrain || 2;
           const tamponsFilleul = parrain.commercants?.affiliation_tampons_filleul || 1;
 
-          // Donner tampons au parrain
           await supabase
             .from("clients")
             .update({
@@ -104,7 +92,6 @@ export default function InscriptionClient() {
             })
             .eq("id", refId);
 
-          // Donner tampons au filleul
           await supabase
             .from("clients")
             .update({
@@ -114,6 +101,19 @@ export default function InscriptionClient() {
             .eq("id", clientData.id);
         }
       }
+    }
+
+    if (form.email) {
+      await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          prenom: form.prenom,
+          nom: form.nom,
+          carteUrl: `https://elitapass.vercel.app/carte/${clientData.id}`,
+        }),
+      });
     }
 
     router.push(`/carte/${clientData.id}`);
@@ -128,6 +128,11 @@ export default function InscriptionClient() {
         <p className="text-gray-400 text-sm text-center mb-6">
           Remplis ce formulaire pour obtenir ta carte
         </p>
+        {refId && (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl px-4 py-3 mb-4 text-center">
+            <p className="text-purple-600 text-sm font-bold">🎁 Tu as été parrainé ! Tu recevras des tampons bonus à l'inscription.</p>
+          </div>
+        )}
         <div className="flex flex-col gap-4">
           <input
             type="text"
