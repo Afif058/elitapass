@@ -33,11 +33,16 @@ export default function RegisterCommercant() {
       return;
     }
 
-    const { error: dbError } = await supabase.from("commercants").insert({
+    const trialEnd = new Date();
+trialEnd.setDate(trialEnd.getDate() + 14);
+
+const { error: dbError } = await supabase.from("commercants").insert({
       id: data.user?.id,
       email: form.email,
       nom_boutique: form.nom_boutique,
-      abonnement: "basic",
+      abonnement: "premium",
+      trial_actif: true,
+      trial_end: trialEnd.toISOString(),
     });
 
     if (dbError) {
