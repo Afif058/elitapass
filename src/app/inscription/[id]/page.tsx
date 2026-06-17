@@ -66,8 +66,14 @@ export default function InscriptionClient() {
     if (refId) {
       const { data: parrain } = await supabase
         .from("clients")
-        .select("*, commercants(*)")
+        .select("*")
         .eq("id", refId)
+        .single();
+
+      const { data: commData } = await supabase
+        .from("commercants")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (parrain) {
@@ -79,8 +85,8 @@ export default function InscriptionClient() {
         if (moisDiff >= 1) countMois = 0;
 
         if (countMois < 3) {
-          const tamponsParrain = parrain.commercants?.affiliation_tampons_parrain || 2;
-          const tamponsFilleul = parrain.commercants?.affiliation_tampons_filleul || 1;
+          const tamponsParrain = commData?.affiliation_tampons_parrain || 2;
+const tamponsFilleul = commData?.affiliation_tampons_filleul || 1;
 
           await supabase
             .from("clients")
