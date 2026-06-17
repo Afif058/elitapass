@@ -94,7 +94,24 @@ export default function Dashboard() {
             <p className="text-gray-500 mt-1">Points distribués</p>
           </div>
         </div>
-
+{/* Affiliation */}
+        <div className="bg-white rounded-2xl p-6 shadow flex flex-col gap-3">
+          <h2 className="text-xl font-bold text-gray-800">🤝 Mon lien d'affiliation</h2>
+          <p className="text-gray-400 text-sm">Partagez ce lien — pour chaque commerçant inscrit via votre lien, vous gagnez 1 mois offert !</p>
+          <div className="bg-gray-50 rounded-xl px-4 py-3 text-gray-600 text-sm break-all">
+            {`https://elitapass.vercel.app/register-commercant?ref=${commercant?.code_affiliation}`}
+          </div>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(`https://elitapass.vercel.app/register-commercant?ref=${commercant?.code_affiliation}`);
+              alert("Lien copié !");
+            }}
+            className="bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition"
+          >
+            📋 Copier mon lien
+          </button>
+        </div>
+        
        {/* Boutons */}
        <button
   onClick={() => router.push("/parametres")}
