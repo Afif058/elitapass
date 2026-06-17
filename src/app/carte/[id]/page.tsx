@@ -180,8 +180,35 @@ export default function CarteClient() {
         </div>
       </div>
 
+      {/* Bouton partager */}
+      <div style={{ marginTop: "16px", width: "100%", maxWidth: "380px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <button
+          onClick={() => {
+            const url = `https://elitapass.vercel.app/inscription/${client.commercant_id}`;
+            if (navigator.share) {
+              navigator.share({
+                title: `Carte fidélité ${commercant?.nom_boutique}`,
+                text: `Rejoins le programme fidélité de ${commercant?.nom_boutique} et gagne des récompenses !`,
+                url,
+              });
+            } else {
+              navigator.clipboard.writeText(url);
+              alert("Lien copié !");
+            }
+          }}
+          style={{
+            background: "#B8965A", color: "#000",
+            fontWeight: "700", fontSize: "15px",
+            padding: "14px", borderRadius: "14px",
+            border: "none", cursor: "pointer", width: "100%",
+          }}
+        >
+          🎁 Partager à mes amis
+        </button>
+      </div>
+
       {/* Branding */}
-      <div style={{ marginTop: "32px", textAlign: "center" }}>
+      <div style={{ marginTop: "16px", textAlign: "center" }}>
         <p style={{ color: "#B8965A", fontWeight: "700", letterSpacing: "3px", fontSize: "13px" }}>ELITAPASS</p>
         <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "11px", marginTop: "4px" }}>L'art de fidéliser</p>
       </div>
