@@ -277,6 +277,30 @@ export default function Parametres() {
             </div>
           </div>
 
+          {/* Affiliation */}
+          <div className="bg-white rounded-2xl p-6 shadow flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-gray-800">🤝 Système d'affiliation</h2>
+            <p className="text-gray-400 text-sm">Récompensez vos clients qui ramènent de nouveaux clients ! Limite : 3 parrainages par client par mois.</p>
+            <div>
+              <label className="text-gray-600 text-sm font-bold">Tampons offerts au parrain</label>
+              <input
+                type="number" min={0} max={10}
+                onChange={(e) => setForm((prev: any) => ({ ...prev, affiliation_tampons_parrain: parseInt(e.target.value) }))}
+                className="border border-gray-300 rounded-xl px-4 py-3 text-gray-800 w-full mt-1 focus:outline-none focus:border-purple-400"
+              />
+              <p className="text-gray-400 text-xs mt-1">Tampons donnés au client qui a partagé son lien</p>
+            </div>
+            <div>
+              <label className="text-gray-600 text-sm font-bold">Tampons offerts au filleul</label>
+              <input
+                type="number" min={0} max={10}
+                onChange={(e) => setForm((prev: any) => ({ ...prev, affiliation_tampons_filleul: parseInt(e.target.value) }))}
+                className="border border-gray-300 rounded-xl px-4 py-3 text-gray-800 w-full mt-1 focus:outline-none focus:border-purple-400"
+              />
+              <p className="text-gray-400 text-xs mt-1">Tampons donnés au nouveau client qui s'inscrit</p>
+            </div>
+          </div>
+
           {succes && <p className="text-green-500 font-bold text-center text-lg">{succes}</p>}
 
           <button onClick={handleSave} disabled={saving}

@@ -72,6 +72,50 @@ export default function InscriptionClient() {
       });
     }
 
+    // Gérer l'affiliation
+    const refId = new URLSearchParams(window.location.search).get("ref");
+    if (refId) {
+      const { data: parrain } = await supabase
+        .from("clients")
+        .select("*, commercants(*)")
+        .eq("id", refId)
+        .single();
+
+      if (parrain) {
+        const maintenant = new Date();
+        const dernierReset = new Date(parrain.affiliation_last_reset || maintenant);
+        const moisDiff = (maintenant.getFullYear() - dernierReset.getFullYear()) * 12 + maintenant.getMonth() - dernierReset.getMonth();
+        
+        let countMois = parrain.affiliation_count_mois || 0;
+        if (moisDiff >= 1) countMois = 0;
+
+        if (countMois < 3) {
+          const tamponsParrain = parrain.commercants?.affiliation_tampons_parrain || 2;
+          const tamponsFilleul = parrain.commercants?.affiliation_tampons_filleul || 1;
+
+          // Donner tampons au parrain
+          await supabase
+            .from("clients")
+            .update({
+              points: (parrain.points || 0) + tamponsParrain,
+              affiliation_count: (parrain.affiliation_count || 0) + 1,
+              affiliation_count_mois: countMois + 1,
+              affiliation_last_reset: moisDiff >= 1 ? maintenant.toISOString() : parrain.affiliation_last_reset,
+            })
+            .eq("id", refId);
+
+          // Donner tampons au filleul
+          await supabase
+            .from("clients")
+            .update({
+              points: tamponsFilleul,
+              affilie_par: refId,
+            })
+            .eq("id", clientData.id);
+        }
+      }
+    }
+
     router.push(`/carte/${clientData.id}`);
   };
 
