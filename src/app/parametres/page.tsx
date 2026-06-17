@@ -36,7 +36,7 @@ const romains = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","
 export default function Parametres() {
   const router = useRouter();
   const [nomBoutique, setNomBoutique] = useState("Ma Boutique");
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<any>({
     couleur_principale: "#B8965A",
     couleur_secondaire: "#000000",
     systeme_fidelite: "tampons",
@@ -44,6 +44,9 @@ export default function Parametres() {
     nb_tampons: 10,
     recompense: "1 offert",
     pourcentage_cagnotte: 5,
+    logo_url: "",
+    affiliation_tampons_parrain: 2,
+    affiliation_tampons_filleul: 1,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -64,6 +67,9 @@ export default function Parametres() {
           nb_tampons: comm.nb_tampons || 10,
           recompense: comm.recompense || "1 offert",
           pourcentage_cagnotte: comm.pourcentage_cagnotte || 5,
+          logo_url: comm.logo_url || "",
+          affiliation_tampons_parrain: comm.affiliation_tampons_parrain || 2,
+          affiliation_tampons_filleul: comm.affiliation_tampons_filleul || 1,
         });
       }
       setLoading(false);
@@ -117,7 +123,11 @@ export default function Parametres() {
                         <p style={{ color: form.couleur_secondaire, fontWeight: "700", fontSize: "13px" }}>{nomBoutique}</p>
                         <p style={{ color: form.couleur_secondaire, fontSize: "10px", opacity: 0.6 }}>✦ VIP</p>
                       </div>
-                      <span style={{ color: form.couleur_secondaire, fontSize: "20px" }}>{currentIcon?.symbol}</span>
+                      {form.logo_url ? (
+                        <img src={form.logo_url} alt="Logo" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
+                      ) : (
+                        <span style={{ color: form.couleur_secondaire, fontSize: "20px" }}>{currentIcon?.symbol}</span>
+                      )}
                     </div>
                     <div>
                       <p style={{ color: form.couleur_secondaire, fontSize: "9px", opacity: 0.5, textTransform: "uppercase", letterSpacing: "1px" }}>Titulaire de la carte</p>
@@ -189,11 +199,11 @@ export default function Parametres() {
 
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-8">
 
-        {/* iPhone EN PREMIER */}
         <IphoneMockup />
 
-        {/* Formulaire en dessous */}
         <div className="flex flex-col gap-6">
+
+          {/* Système fidélité */}
           <div className="bg-white rounded-2xl p-6 shadow flex flex-col gap-4">
             <h2 className="text-xl font-bold text-gray-800">Système de fidélité</h2>
             <div className="flex flex-col gap-3">
@@ -246,6 +256,7 @@ export default function Parametres() {
             )}
           </div>
 
+          {/* Symbole */}
           <div className="bg-white rounded-2xl p-6 shadow flex flex-col gap-4">
             <h2 className="text-xl font-bold text-gray-800">Symbole de ta carte</h2>
             <div className="grid grid-cols-5 gap-2">
@@ -259,6 +270,7 @@ export default function Parametres() {
             </div>
           </div>
 
+          {/* Couleurs */}
           <div className="bg-white rounded-2xl p-6 shadow flex flex-col gap-4">
             <h2 className="text-xl font-bold text-gray-800">Couleurs</h2>
             <div className="flex gap-6">
@@ -266,7 +278,7 @@ export default function Parametres() {
                 <label className="text-gray-600 text-sm font-bold">Fond de la carte</label>
                 <input type="color" value={form.couleur_principale}
                   onChange={(e) => setForm({ ...form, couleur_principale: e.target.value })}
-                  className="w-full h-14 rounded-xl cursor-pointer border-2 border-gray-200 p-1" />
+                  className="w-full h-14 rounded-xl cursor-pointer border-2 border-gray-200 p1" />
               </div>
               <div className="flex flex-col gap-2 flex-1">
                 <label className="text-gray-600 text-sm font-bold">Texte de la carte</label>
@@ -277,6 +289,33 @@ export default function Parametres() {
             </div>
           </div>
 
+          {/* Logo */}
+          <div className="bg-white rounded-2xl p-6 shadow flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-gray-800">Logo de ta boutique</h2>
+            {form.logo_url && (
+              <img src={form.logo_url} alt="Logo" className="w-20 h-20 rounded-2xl object-cover mx-auto" />
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const { data: { user } } = await supabase.auth.getUser();
+                const path = `${user?.id}/logo.${file.name.split(".").pop()}`;
+                const { error } = await supabase.storage
+                  .from("logos")
+                  .upload(path, file, { upsert: true });
+                if (!error) {
+                  const { data } = supabase.storage.from("logos").getPublicUrl(path);
+                  setForm((prev: any) => ({ ...prev, logo_url: data.publicUrl }));
+                }
+              }}
+              className="border border-gray-300 rounded-xl px-4 py-3 text-gray-800 w-full"
+            />
+            <p className="text-gray-400 text-xs">Format recommandé : carré, PNG ou JPG</p>
+          </div>
+
           {/* Affiliation */}
           <div className="bg-white rounded-2xl p-6 shadow flex flex-col gap-4">
             <h2 className="text-xl font-bold text-gray-800">🤝 Système d'affiliation</h2>
@@ -285,6 +324,7 @@ export default function Parametres() {
               <label className="text-gray-600 text-sm font-bold">Tampons offerts au parrain</label>
               <input
                 type="number" min={0} max={10}
+                value={form.affiliation_tampons_parrain}
                 onChange={(e) => setForm((prev: any) => ({ ...prev, affiliation_tampons_parrain: parseInt(e.target.value) }))}
                 className="border border-gray-300 rounded-xl px-4 py-3 text-gray-800 w-full mt-1 focus:outline-none focus:border-purple-400"
               />
@@ -294,6 +334,7 @@ export default function Parametres() {
               <label className="text-gray-600 text-sm font-bold">Tampons offerts au filleul</label>
               <input
                 type="number" min={0} max={10}
+                value={form.affiliation_tampons_filleul}
                 onChange={(e) => setForm((prev: any) => ({ ...prev, affiliation_tampons_filleul: parseInt(e.target.value) }))}
                 className="border border-gray-300 rounded-xl px-4 py-3 text-gray-800 w-full mt-1 focus:outline-none focus:border-purple-400"
               />
