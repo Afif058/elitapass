@@ -63,6 +63,7 @@ export default function InscriptionClient() {
     });
 
     // Gérer l'affiliation
+    console.log("refId:", refId);
     if (refId) {
       const { data: parrain } = await supabase
         .from("clients")
@@ -76,6 +77,8 @@ export default function InscriptionClient() {
         .eq("id", id)
         .single();
 
+      console.log("parrain trouvé:", parrain);
+
       if (parrain) {
         const maintenant = new Date();
         const dernierReset = new Date(parrain.affiliation_last_reset || maintenant);
@@ -86,7 +89,7 @@ export default function InscriptionClient() {
 
         if (countMois < 3) {
           const tamponsParrain = commData?.affiliation_tampons_parrain || 2;
-const tamponsFilleul = commData?.affiliation_tampons_filleul || 1;
+          const tamponsFilleul = commData?.affiliation_tampons_filleul || 1;
 
           await supabase
             .from("clients")
